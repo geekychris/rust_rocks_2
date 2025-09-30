@@ -1,0 +1,16 @@
+partition,key,value
+users,john,John Doe
+users,jane,Jane Smith
+users,bob,Bob Johnson
+users,alice,Alice Williams
+products,laptop-001,Gaming Laptop 16GB RAM Intel i7
+products,mouse-001,Wireless Gaming Mouse RGB
+products,keyboard-001,Mechanical Keyboard Cherry MX Blue
+logs,2024-01-15-001,Application started successfully at 08:00:00
+logs,2024-01-15-002,User john logged in at 08:15:33
+logs,2024-01-15-003,Order order-12345 created at 09:22:15
+logs,2024-01-15-004,Payment processed for order-12345 at 09:23:01
+config,database_url,postgresql://localhost:5432/rustrocks
+config,redis_url,redis://localhost:6379/0
+config,log_level,info
+config,max_connections,100

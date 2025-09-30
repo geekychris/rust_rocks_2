@@ -1,0 +1,26 @@
+[server]
+grpc_port = 50051
+rest_port = 8080
+rocksdb_path = "./data"
+# node_id = "auto-generated-if-not-specified"
+
+[replication]
+enabled = false
+sync_interval_seconds = 10
+health_check_interval_seconds = 30
+
+# Example peer configurations (uncomment and modify as needed)
+# [[replication.peers]]
+# node_id = "node-2"
+# address = "127.0.0.1"
+# port = 50052
+
+# [[replication.peers]]
+# node_id = "node-3"
+# address = "127.0.0.1"
+# port = 50053
+
+[logging]
+level = "info"
+format = "pretty"  # or "json"
+# file = "/var/log/rustrocks-service.log"  # Optional: log to file

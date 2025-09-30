@@ -1,0 +1,11 @@
+partition,key,value
+users,john_doe,John Doe
+users,jane_smith,Jane Smith
+products,laptop-001,Gaming Laptop 16GB RAM Intel i7
+products,monitor-001,27" 4K HDR Monitor
+orders,ord-001,{"customer":"john_doe","total":1499.99}
+orders,ord-002,{"customer":"jane_smith","total":799.99}
+config,db_url,postgresql://localhost:5432/test
+config,cache_url,redis://localhost:6379/0
+meta,test_id,TEST-123
+meta,created_at,2024-01-15T12:00:00Z

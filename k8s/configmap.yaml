@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rustrocks-config
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: config
+data:
+  config.toml: |
+    [server]
+    grpc_port = 50051
+    rest_port = 8080
+    rocksdb_path = "/data"
+
+    [replication]
+    enabled = true
+    sync_interval_seconds = 10
+    health_check_interval_seconds = 30
+
+    [logging]
+    level = "info"
+    format = "json"
+
+  # Script to generate peer configuration based on StatefulSet
+  init-peers.sh: |
+    #!/bin/bash
+    PEERS=""
+    for i in $(seq 0 $((REPLICA_COUNT-1))); do
+      if [ $i -ne $POD_INDEX ]; then
+        if [ -n "$PEERS" ]; then
+          PEERS="${PEERS},"
+        fi
+        PEERS="${PEERS}node${i}:rustrocks-service-${i}.rustrocks-service-headless.rustrocks.svc.cluster.local:50051"
+      fi
+    done
+    echo "Generated peers: $PEERS"
+    export RUSTROCKS_PEERS="$PEERS"

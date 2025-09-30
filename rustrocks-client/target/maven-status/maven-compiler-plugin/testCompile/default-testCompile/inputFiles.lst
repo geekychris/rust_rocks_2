@@ -1,0 +1,4 @@
+/Users/chris/code/warp_experiments/rustrocks2/rustrocks-client/src/test/java/com/rustrocks/client/integration/IntegrationTestBase.java
+/Users/chris/code/warp_experiments/rustrocks2/rustrocks-client/src/test/java/com/rustrocks/client/integration/GrpcClientIT.java
+/Users/chris/code/warp_experiments/rustrocks2/rustrocks-client/src/test/java/com/rustrocks/client/integration/RestClientIT.java
+/Users/chris/code/warp_experiments/rustrocks2/rustrocks-client/src/test/java/com/rustrocks/client/integration/CsvProcessorIT.java

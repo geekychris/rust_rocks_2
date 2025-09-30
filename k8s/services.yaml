@@ -1,0 +1,106 @@
+# Headless service for StatefulSet pod discovery
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustrocks-service-headless
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+    protocol: TCP
+  - name: rest
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: rustrocks-service
+
+---
+# Load balancer service for external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustrocks-service
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: loadbalancer
+  annotations:
+    # Cloud-specific annotations for load balancer configuration
+    # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    # service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+    protocol: TCP
+  - name: rest
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: rustrocks-service
+  # Optional: Specify load balancer source ranges
+  # loadBalancerSourceRanges:
+  # - 10.0.0.0/8
+  # - 192.168.0.0/16
+
+---
+# ClusterIP service for internal cluster access
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustrocks-service-internal
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: internal
+spec:
+  type: ClusterIP
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+    protocol: TCP
+  - name: rest
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: rustrocks-service
+
+---
+# NodePort service for development/testing
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustrocks-service-nodeport
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: nodeport
+spec:
+  type: NodePort
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+    protocol: TCP
+    nodePort: 30051
+  - name: rest
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 30080
+  selector:
+    app.kubernetes.io/name: rustrocks-service

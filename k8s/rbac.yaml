@@ -1,0 +1,133 @@
+# ServiceAccount for RustRocks service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rustrocks-service-account
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: security
+automountServiceAccountToken: false
+
+---
+# ClusterRole with minimal permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rustrocks-service-role
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: security
+rules:
+# Allow reading of endpoint information for peer discovery
+- apiGroups: [""]
+  resources: ["endpoints", "services"]
+  verbs: ["get", "list", "watch"]
+# Allow reading of pod information for replication setup
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+# ClusterRoleBinding to bind the role to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: rustrocks-service-binding
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: security
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rustrocks-service-role
+subjects:
+- kind: ServiceAccount
+  name: rustrocks-service-account
+  namespace: rustrocks
+
+---
+# NetworkPolicy to restrict network access
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rustrocks-network-policy
+  namespace: rustrocks
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rustrocks-service
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traffic on gRPC port
+  - ports:
+    - protocol: TCP
+      port: 50051
+  # Allow traffic on REST port
+  - ports:
+    - protocol: TCP
+      port: 8080
+  # Allow inter-pod communication for replication
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: rustrocks-service
+    ports:
+    - protocol: TCP
+      port: 50051
+  egress:
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow inter-pod communication for replication
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: rustrocks-service
+    ports:
+    - protocol: TCP
+      port: 50051
+  # Allow access to Kubernetes API for service discovery
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+
+---
+# PodSecurityPolicy (deprecated in K8s 1.25+, use Pod Security Standards instead)
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: rustrocks-psp
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: security
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+  - ALL
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny

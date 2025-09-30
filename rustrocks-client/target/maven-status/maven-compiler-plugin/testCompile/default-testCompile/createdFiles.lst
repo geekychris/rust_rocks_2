@@ -1,0 +1,4 @@
+com/rustrocks/client/integration/GrpcClientIT.class
+com/rustrocks/client/integration/RestClientIT.class
+com/rustrocks/client/integration/IntegrationTestBase.class
+com/rustrocks/client/integration/CsvProcessorIT.class

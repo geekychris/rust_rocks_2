@@ -1,0 +1,7 @@
+partition,key,value
+users,john,John Doe
+users,jane,Jane Smith
+products,laptop,Gaming Laptop
+products,mouse,Wireless Mouse
+config,max_users,1000
+config,timeout,30

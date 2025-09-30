@@ -1,0 +1,117 @@
+# High-performance SSD storage class for production workloads
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rustrocks-fast-ssd
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: storage
+parameters:
+  # AWS EBS gp3 volumes
+  type: gp3
+  iops: "10000"
+  throughput: "500"
+  # GCP persistent disks
+  # type: pd-ssd
+  # replication-type: regional-pd
+  # Azure managed disks
+  # kind: managed
+  # storageaccounttype: Premium_LRS
+provisioner: kubernetes.io/aws-ebs  # Change based on cloud provider
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+
+---
+# Standard SSD storage class for development/testing
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rustrocks-standard-ssd
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: storage
+parameters:
+  # AWS EBS gp2 volumes
+  type: gp2
+  # GCP persistent disks
+  # type: pd-standard
+  # Azure managed disks
+  # kind: managed
+  # storageaccounttype: StandardSSD_LRS
+provisioner: kubernetes.io/aws-ebs  # Change based on cloud provider
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+
+---
+# Local SSD storage class for maximum performance (ephemeral)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rustrocks-local-ssd
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: storage
+parameters:
+  volumeType: local-ssd
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: false
+reclaimPolicy: Delete
+
+---
+# Example PersistentVolume for local testing with hostPath
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rustrocks-local-pv-0
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: storage
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/rustrocks-data/node-0
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node-1  # Replace with actual node name
+
+---
+# Example local storage class for development
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: false
+reclaimPolicy: Delete
+
+---
+# VolumeSnapshotClass for backup and restore (requires CSI driver support)
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: rustrocks-snapshot-class
+  labels:
+    app.kubernetes.io/name: rustrocks-service
+    app.kubernetes.io/component: backup
+driver: ebs.csi.aws.com  # Change based on CSI driver
+deletionPolicy: Retain
+# parameters:
+#   # AWS EBS specific parameters
+#   # encrypted: "true"

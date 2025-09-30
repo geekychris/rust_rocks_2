@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # Node 1 - Main node
+  rustrocks-node1:
+    build: .
+    ports:
+      - "50051:50051"  # gRPC
+      - "8080:8080"    # REST
+    volumes:
+      - node1_data:/app/data
+    environment:
+      - RUST_LOG=info
+    command: >
+      rustrocks-service
+      --grpc-port 50051
+      --rest-port 8080
+      --node-id node1
+      --data-dir /app/data
+      --enable-replication
+      --peers node2:rustrocks-node2:50051,node3:rustrocks-node3:50051
+    networks:
+      - rustrocks-network
+
+  # Node 2 - Replica node  
+  rustrocks-node2:
+    build: .
+    ports:
+      - "50052:50051"  # gRPC (mapped to different host port)
+      - "8081:8080"    # REST (mapped to different host port)
+    volumes:
+      - node2_data:/app/data
+    environment:
+      - RUST_LOG=info
+    command: >
+      rustrocks-service
+      --grpc-port 50051
+      --rest-port 8080
+      --node-id node2
+      --data-dir /app/data
+      --enable-replication
+      --peers node1:rustrocks-node1:50051,node3:rustrocks-node3:50051
+    networks:
+      - rustrocks-network
+    depends_on:
+      - rustrocks-node1
+
+  # Node 3 - Another replica node
+  rustrocks-node3:
+    build: .
+    ports:
+      - "50053:50051"  # gRPC (mapped to different host port)
+      - "8082:8080"    # REST (mapped to different host port)
+    volumes:
+      - node3_data:/app/data
+    environment:
+      - RUST_LOG=info
+    command: >
+      rustrocks-service
+      --grpc-port 50051
+      --rest-port 8080
+      --node-id node3
+      --data-dir /app/data
+      --enable-replication
+      --peers node1:rustrocks-node1:50051,node2:rustrocks-node2:50051
+    networks:
+      - rustrocks-network
+    depends_on:
+      - rustrocks-node1
+
+  # Test client service
+  test-client:
+    image: curlimages/curl:8.5.0
+    volumes:
+      - ./test_service.sh:/test_service.sh:ro
+    networks:
+      - rustrocks-network
+    depends_on:
+      - rustrocks-node1
+      - rustrocks-node2
+      - rustrocks-node3
+    profiles:
+      - test
+    command: >
+      sh -c "
+      sleep 10 &&
+      echo 'Testing Node 1...' &&
+      curl -X POST http://rustrocks-node1:8080/put -H 'Content-Type: application/json' -d '{\"partition\":\"test\",\"key\":\"key1\",\"value\":[72,101,108,108,111]}' &&
+      echo '' &&
+      curl -X POST http://rustrocks-node1:8080/get -H 'Content-Type: application/json' -d '{\"partition\":\"test\",\"key\":\"key1\"}' &&
+      echo '' &&
+      echo 'Testing Node 2...' &&
+      sleep 5 &&
+      curl -X POST http://rustrocks-node2:8080/get -H 'Content-Type: application/json' -d '{\"partition\":\"test\",\"key\":\"key1\"}' &&
+      echo '' &&
+      echo 'Testing Node 3...' &&
+      curl -X POST http://rustrocks-node3:8080/get -H 'Content-Type: application/json' -d '{\"partition\":\"test\",\"key\":\"key1\"}' &&
+      echo '' &&
+      echo 'All tests completed!'
+      "
+
+volumes:
+  node1_data:
+    driver: local
+  node2_data:
+    driver: local
+  node3_data:
+    driver: local
+
+networks:
+  rustrocks-network:
+    driver: bridge

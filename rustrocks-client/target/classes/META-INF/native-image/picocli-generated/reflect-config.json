@@ -1,0 +1,128 @@
+[
+  {
+    "name" : "com.rustrocks.client.RustRocksClient",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "host" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$BatchCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "csvFile" },
+      { "name" : "host" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$DeleteCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "host" },
+      { "name" : "key" },
+      { "name" : "partition" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$GetCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "binary" },
+      { "name" : "host" },
+      { "name" : "key" },
+      { "name" : "partition" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$HealthCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "host" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$MultiGetCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "binary" },
+      { "name" : "host" },
+      { "name" : "keys" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$PrefixCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "binary" },
+      { "name" : "host" },
+      { "name" : "keyPrefix" },
+      { "name" : "limit" },
+      { "name" : "partition" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "com.rustrocks.client.RustRocksClient$PutCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "host" },
+      { "name" : "key" },
+      { "name" : "partition" },
+      { "name" : "port" },
+      { "name" : "protocol" },
+      { "name" : "value" },
+      { "name" : "verbose" }
+    ]
+  },
+  {
+    "name" : "java.lang.Integer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true
+  }
+]

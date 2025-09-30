@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package rocksdb_service;
+
+// The RocksDB service definition
+service RocksDbService {
+  // Put a key-value pair
+  rpc Put(PutRequest) returns (PutResponse);
+  
+  // Get a value by key
+  rpc Get(GetRequest) returns (GetResponse);
+  
+  // Get multiple values by keys
+  rpc MultiGet(MultiGetRequest) returns (MultiGetResponse);
+  
+  // Get values by prefix
+  rpc GetByPrefix(GetByPrefixRequest) returns (GetByPrefixResponse);
+  
+  // Delete a key
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+  
+  // Replication methods
+  rpc GetReplicationEntries(ReplicationEntriesRequest) returns (ReplicationEntriesResponse);
+  rpc SyncReplication(stream ReplicationEntry) returns (SyncReplicationResponse);
+}
+
+// Core data structures
+message CompositeKey {
+  string partition = 1;
+  string key = 2;
+}
+
+message KeyValue {
+  string key = 1;
+  bytes value = 2;
+}
+
+// Request/Response messages
+message PutRequest {
+  string partition = 1;
+  string key = 2;
+  bytes value = 3;
+}
+
+message PutResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+message GetRequest {
+  string partition = 1;
+  string key = 2;
+}
+
+message GetResponse {
+  bool found = 1;
+  optional bytes value = 2;
+  optional string error = 3;
+}
+
+message MultiGetRequest {
+  repeated CompositeKey keys = 1;
+}
+
+message KeyValueResult {
+  CompositeKey key = 1;
+  optional bytes value = 2;
+}
+
+message MultiGetResponse {
+  repeated KeyValueResult results = 1;
+  optional string error = 2;
+}
+
+message GetByPrefixRequest {
+  string partition = 1;
+  string key_prefix = 2;
+  optional uint32 limit = 3;
+}
+
+message GetByPrefixResponse {
+  repeated KeyValue results = 1;
+  optional string error = 2;
+}
+
+message DeleteRequest {
+  string partition = 1;
+  string key = 2;
+}
+
+message DeleteResponse {
+  bool success = 1;
+  optional string error = 2;
+}
+
+// Replication messages
+message ReplicationEntry {
+  uint64 sequence_number = 1;
+  ReplicationOperation operation = 2;
+  uint64 timestamp = 3;
+}
+
+message ReplicationOperation {
+  oneof operation_type {
+    PutOperation put = 1;
+    DeleteOperation delete = 2;
+  }
+}
+
+message PutOperation {
+  string partition = 1;
+  string key = 2;
+  bytes value = 3;
+}
+
+message DeleteOperation {
+  string partition = 1;
+  string key = 2;
+}
+
+message ReplicationEntriesRequest {
+  uint64 from_sequence = 1;
+  optional uint32 limit = 2;
+}
+
+message ReplicationEntriesResponse {
+  repeated ReplicationEntry entries = 1;
+  optional string error = 2;
+}
+
+message SyncReplicationResponse {
+  bool success = 1;
+  uint64 last_sequence_applied = 2;
+  optional string error = 3;
+}
