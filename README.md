@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Rust Rocks 2 logo" width="180">
+</p>
+
 # RustRocks Service
 
 A high-performance RocksDB service written in Rust that provides both REST and gRPC APIs with built-in replication support.
